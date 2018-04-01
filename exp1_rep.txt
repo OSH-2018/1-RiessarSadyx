@@ -1,0 +1,26 @@
+实验一 实验报告
+
+实验题目:
+调试操作系统的启动过程
+
+实验环境：
+Virtual Box 虚拟机下的 Ubuntu 16.04 amd64
+
+实验工具：
+qemu
+gdb
+
+实验步骤：
+1.使用命令 apt install qemu 安装 qemu 软件。
+2.自 http://www.kernel.org/pub/linux/kernel/v4.x/linux-4.13.1.tar.gz 下载 Linux 4.13 的内核源码。
+3.使用 tar -zxvf linux-4.13.1.tar.gz 解压到当前目录下。
+4.使用 cd linux-4.13.1 进入目录。
+5.使用 make menuconfig 进行配置，之后使用 make -j8 进行编译。
+6.编译后，在 ./arch/x86/boot 下生成了 bzImage 文件。
+7.使用 qemu -s -S --kernel arch/x86/boot/bzImage -initrd rootfs.img -append "nokaslr" 运行并在 CPU 启动时冻结，同时打开 tcp:1234 端口用于 gdb 调试。
+8.打开另一个终端，输入 gdb vmlinux ，再输入 target remote 127.0.0.1:1234 开始调试。
+9.使用 gdb 加入断点，如：b start_kernel ，执行到断点处，再用 list 查看上下文。
+
+实验结果：
+1.start_kernel() 将解压内核，创建 PID 为 0 的进程 init_task() ，初始化内存管理模块、中断、调度模块等，运行 rest_init() 并开始初始化进程。
+2.early_trap_init() 将初始化调试功能以及#BP中断门。
